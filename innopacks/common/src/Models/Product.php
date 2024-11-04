@@ -231,4 +231,15 @@ class Product extends BaseModel
     {
         return image_resize($this->image->path ?? '', $with, $height);
     }
+
+    public function decrementStock($quantity) {
+        if ($this->stock < $quantity) {
+            throw new \Exception("Stock tidak mencukupi untuk produk " . $this->name);
+        }
+        $this->decrement('stock', $quantity);
+    }
+
+    public function incrementStock($quantity) {
+        $this->increment('stock', $quantity);
+    }
 }
