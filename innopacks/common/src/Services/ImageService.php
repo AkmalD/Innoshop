@@ -81,31 +81,35 @@ class ImageService
      * @param  int  $height
      * @return string
      */
-    public function resize(int $width = 100, int $height = 100): string
-    {
-        try {
-            $extension = pathinfo($this->imagePath, PATHINFO_EXTENSION);
-            $newImage  = 'cache/'.mb_substr($this->image, 0, mb_strrpos($this->image, '.')).'-'.$width.'x'.$height.'.'.$extension;
 
-            $newImagePath = public_path($newImage);
-            if (! is_file($newImagePath) || (filemtime($this->imagePath) > filemtime($newImagePath))) {
+public function resize(int $width = 100, int $height = 100): string
+{
+    try {
+        $extension = pathinfo($this->imagePath, PATHINFO_EXTENSION);
+        $newImage  = 'cache/' . mb_substr($this->image, 0, mb_strrpos($this->image, '.')) . '-' . $width . 'x' . $height . '.' . $extension;
 
-                create_directories(dirname($newImagePath));
+        $newImagePath = public_path($newImage);
+        if (!is_file($newImagePath) || (filemtime($this->imagePath) > filemtime($newImagePath))) {
+            create_directories(dirname($newImagePath));
 
-                $manager = new ImageManager(new Driver);
-                $image   = $manager->read($this->imagePath);
+            // Buat instance ImageManager tanpa menginisialisasi driver secara manual
+            $manager = new ImageManager(['driver' => 'gd']); // Atau 'imagick' jika Anda ingin menggunakan Imagick
 
-                $image->cover($width, $height);
-                $image->save($newImagePath);
-            }
+            // Baca gambar dengan make()
+            $image = $manager->make($this->imagePath);
 
-            return asset($newImage);
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-
-            return $this->originUrl();
+            $image->fit($width, $height); // Gunakan fit() untuk crop proporsional
+            $image->save($newImagePath);
         }
+
+        return asset($newImage);
+    } catch (Exception $e) {
+        Log::error($e->getMessage());
+
+        return $this->originUrl();
     }
+}
+
 
     /**
      * Get original image url.
