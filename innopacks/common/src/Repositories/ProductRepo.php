@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) Since 2024 InnoShop - All Rights Reserved
  *
@@ -28,11 +29,17 @@ class ProductRepo extends BaseRepo
     {
         return [
             ['name' => 'keyword', 'type' => 'input', 'label' => trans('panel/common.name')],
-            ['name'     => 'price', 'type' => 'range', 'label' => trans('panel/product.price'),
+            [
+                'name'     => 'price',
+                'type' => 'range',
+                'label' => trans('panel/product.price'),
                 'start' => ['name' => 'price_start'],
                 'end'   => ['name' => 'price_end'],
             ],
-            ['name'     => 'created_at', 'type' => 'date_range', 'label' => trans('panel/common.created_at'),
+            [
+                'name'     => 'created_at',
+                'type' => 'date_range',
+                'label' => trans('panel/common.created_at'),
                 'start' => ['name' => 'start'],
                 'end'   => ['name' => 'end'],
             ],
@@ -60,7 +67,10 @@ class ProductRepo extends BaseRepo
         $order   = $filters['order']    ?? 'desc';
         $perPage = $filters['per_page'] ?? 15;
 
-        $builder = $this->withActive()->builder($filters);
+        // Tambahkan eager loading untuk relasi yang sering digunakan
+        $builder = $this->withActive()
+            ->builder($filters)
+            ->with(['images', 'skus', 'translations', 'categories.translations']); // Eager loading relasi
 
         if ($sort == 'pt.name') {
             $builder->select(['products.*', 'pt.name', 'pt.content']);
