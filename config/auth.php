@@ -40,6 +40,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        // 'admin' => [ // Add this block
+        //     'driver' => 'session',
+        //     'provider' => 'admins',
+        // ],
     ],
 
     /*
@@ -69,6 +73,7 @@ return [
         //     'driver' => 'database',
         //     'table' => 'users',
         // ],
+        
     ],
 
     /*

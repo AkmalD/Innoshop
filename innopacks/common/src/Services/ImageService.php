@@ -93,7 +93,7 @@ public function resize(int $width = 100, int $height = 100): string
             create_directories(dirname($newImagePath));
 
             // Buat instance ImageManager tanpa menginisialisasi driver secara manual
-            $manager = new ImageManager(['driver' => 'gd']); // Atau 'imagick' jika Anda ingin menggunakan Imagick
+            $manager = new ImageManager(['driver' => 'gd']); 
 
             // Baca gambar dengan make()
             $image = $manager->make($this->imagePath);
@@ -109,7 +109,6 @@ public function resize(int $width = 100, int $height = 100): string
         return $this->originUrl();
     }
 }
-
 
     /**
      * Get original image url.
