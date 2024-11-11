@@ -18,6 +18,7 @@ use InnoShop\Common\Repositories\ProductRepo;
 use InnoShop\Common\Repositories\ReviewRepo;
 use InnoShop\Common\Resources\ReviewListItem;
 use InnoShop\Common\Resources\SkuListItem;
+use Illuminate\Support\Facades\Cache;
 
 class ProductController extends Controller
 {
@@ -62,11 +63,17 @@ class ProductController extends Controller
      */
     public function slugShow(Request $request): mixed
     {
-        $slug    = $request->slug;
-        $product = ProductRepo::getInstance()->withActive()->builder(['slug' => $slug])->firstOrFail();
+        $slug = $request->slug;
+
+        // Caching data produk berdasarkan slug
+        $cacheKey = "product_slug_{$slug}";
+        $product = Cache::remember($cacheKey, now()->addMinutes(30), function () use ($slug) {
+            return ProductRepo::getInstance()->withActive()
+                ->builder(['slug' => $slug])
+                ->firstOrFail();
+        });
 
         $skuId = $request->get('sku_id');
-
         return $this->renderShow($product, $skuId);
     }
 
