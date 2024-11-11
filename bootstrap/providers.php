@@ -3,11 +3,11 @@
 return [
     App\Providers\AppServiceProvider::class,
     App\Providers\AuthServiceProvider::class,
-
-    InnoShop\Install\InstallServiceProvider::class,
+    App\Providers\TelescopeServiceProvider::class,
     InnoShop\Common\CommonServiceProvider::class,
-    InnoShop\Panel\PanelServiceProvider::class,
     InnoShop\Front\FrontServiceProvider::class,
-    InnoShop\RestAPI\RestAPIServiceProvider::class,
+    InnoShop\Install\InstallServiceProvider::class,
+    InnoShop\Panel\PanelServiceProvider::class,
     InnoShop\Plugin\PluginServiceProvider::class,
+    InnoShop\RestAPI\RestAPIServiceProvider::class,
 ];
