@@ -714,6 +714,8 @@ return new class extends Migration
             $table->string('weight_class')->default('')->comment('Weight Class');
             $table->integer('sales')->default(0)->comment('Sales');
             $table->integer('viewed')->default(0)->comment('Viewed');
+            $table->integer('stock')->default(0);  // Kolom stok
+            $table->integer('version')->default(0);  // Kolom versi untuk optimistic locking        
             $table->timestamp('published_at')->nullable()->comment('Published At');
             $table->softDeletes()->comment('Deleted At');
             $table->timestamps();

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) Since 2024 InnoShop - All Rights Reserved
  *
@@ -9,6 +10,8 @@
 
 namespace InnoShop\Front\Controllers;
 
+use InnoShop\Common\Models\Product; // Add Product model import at the top
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -71,18 +74,56 @@ class CheckoutController extends Controller
      */
     public function confirm(CheckoutConfirmRequest $request): JsonResponse
     {
+        DB::beginTransaction();
         try {
+            // Initialize checkout service
             $checkout = CheckoutService::getInstance();
-            $data     = $request->all();
+            $data = $request->all();
+
+            // Step 1: Update checkout values if there is data
             if ($data) {
                 $checkout->updateValues($data);
             }
 
+            // Step 2: Retrieve cart items (assuming cart_items is a key in $data)
+            $cartItems = $data['cart_items'] ?? [];
+
+            // Step 3: Loop through each item in the cart and apply concurrency control
+            foreach ($cartItems as $cartItem) {
+                $productId = $cartItem['product_id'];
+                $quantity = $cartItem['quantity'];
+                $version = $cartItem['version'] ?? null; // Assuming version is sent in request
+
+                // Retrieve product with pessimistic locking
+                $product = Product::where('id', $productId)->lockForUpdate()->first();
+
+                // Check stock availability
+                if ($product->stock < $quantity) {
+                    throw new Exception("Insufficient stock for product ID: $productId.");
+                }
+
+                // Check optimistic locking (compare version)
+                if ($version && $product->version !== $version) {
+                    throw new Exception("Product ID: $productId has been updated by another transaction.");
+                }
+
+                // Reduce stock and increment version for optimistic control
+                $product->stock -= $quantity;
+                $product->version += 1;  // Increment version to reflect change
+                $product->save();
+            }
+
+            // Step 4: Confirm the order after stock validation
             $order = $checkout->confirm();
             StateMachineService::getInstance($order)->changeStatus(StateMachineService::UNPAID, '', true);
 
+            // Commit transaction after successful checkout process
+            DB::commit();
+
             return json_success(front_trans('common.submitted_success'), $order);
         } catch (Exception $e) {
+            // Rollback transaction on failure
+            DB::rollBack();
             return json_fail($e->getMessage());
         }
     }
