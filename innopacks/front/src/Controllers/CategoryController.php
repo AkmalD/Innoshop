@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) Since 2024 InnoShop - All Rights Reserved
  *
@@ -74,19 +75,21 @@ class CategoryController extends Controller
      */
     private function renderShow($slug, $keyword): mixed
     {
-        $cacheKey = cache_key('category', ['slug' => $slug, 'keyword' => $keyword]);
+        $cacheKey = cache_key('category_products', ['slug' => $slug, 'keyword' => $keyword, 'sort' => request('sort'), 'order' => request('order')]);
 
-        return Cache::remember($cacheKey, 0, function () use ($slug, $keyword) {
+        return Cache::remember($cacheKey, now()->addMinutes(10), function () use ($slug, $keyword) {
             $category   = CategoryRepo::getInstance()->withActive()->builder(['slug' => $slug])->firstOrFail();
             $categories = CategoryRepo::getInstance()->getTwoLevelCategories();
 
             $filters = [
                 'category_id' => $category->id,
                 'keyword'     => $keyword,
-                'sort'        => \request('sort'),
-                'order'       => \request('order'),
-                'per_page'    => \request('per_page'),
+                'sort'        => request('sort'),
+                'order'       => request('order'),
+                'per_page'    => request('per_page'),
             ];
+
+            // Panggil metode getFrontList yang telah dioptimalkan
             $products = ProductRepo::getInstance()->getFrontList($filters);
 
             $data = [
