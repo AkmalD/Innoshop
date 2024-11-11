@@ -9,6 +9,7 @@
 
 namespace InnoShop\Panel\Controllers;
 
+use App\Http\Controllers\ImageController;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use InnoShop\Common\Models\Article;
@@ -65,6 +66,27 @@ class ArticleController extends BaseController
         }
     }
 
+    // public function store(ArticleRequest $request): RedirectResponse
+    // {
+    //     try {
+    //         $data = $request->all();
+
+    //         // Panggil ImageController untuk memproses gambar jika ada
+    //         if ($request->hasFile('image')) {
+    //             $imageController = new ImageController();
+    //             $data['image_path'] = $imageController->uploadAndOptimize($request);
+    //         }
+
+    //         $article = ArticleRepo::getInstance()->create($data);
+
+    //         return redirect(panel_route('articles.index'))
+    //             ->with('instance', $article)
+    //             ->with('success', panel_trans('common.updated_success'));
+    //     } catch (\Exception $e) {
+    //         return back()->withInput()->withErrors(['error' => $e->getMessage()]);
+    //     }
+    // }
+
     /**
      * @param  Article  $article
      * @return mixed
@@ -109,6 +131,27 @@ class ArticleController extends BaseController
             return back()->withInput()->withErrors(['error' => $e->getMessage()]);
         }
     }
+
+    // public function update(ArticleRequest $request, Article $article): RedirectResponse
+    // {
+    //     try {
+    //         $data = $request->all();
+
+    //         // Panggil ImageController untuk memproses gambar jika ada
+    //         if ($request->hasFile('image')) {
+    //             $imageController = new ImageController();
+    //             $data['image_path'] = $imageController->uploadAndOptimize($request);
+    //         }
+
+    //         ArticleRepo::getInstance()->update($article, $data);
+
+    //         return redirect(panel_route('articles.index'))
+    //             ->with('instance', $article)
+    //             ->with('success', panel_trans('common.updated_success'));
+    //     } catch (\Exception $e) {
+    //         return back()->withInput()->withErrors(['error' => $e->getMessage()]);
+    //     }
+    // }
 
     /**
      * @param  Article  $article
